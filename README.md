@@ -1,0 +1,1 @@
+Prompts the user for a keyword to search, opens a blank version of your browser, scans the shooting stars page for all instances of the keyword, and spits them out in a table, both on the console of the IDE and a window, and after 15 seconds (changeable in the script if needed/wanted) the script ends. 
