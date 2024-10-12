@@ -32,10 +32,12 @@ root.update()
 
 # If a user is running this script manually, prompt can be bypassed by commenting out input line and uncommenting string line modified to preference.
 #location = "khazard"
-location = simpledialog.askstring(title = "Input", prompt="Which star location would you like to search for?").lower()
-print(f"Searching for {location} now.")
+location = simpledialog.askstring(title = "Input", prompt="Which star location would you like to search for? Multiple locations can be searched using ;. (e.g falador;port;varrock)").lower()
+locations = location.split(sep = ";")
+print(locations)
+print(f"Searching for {locations} now.")
 
-output_label = tk.Label(root, text = f"Searching for {location} now.")
+output_label = tk.Label(root, text = f"Searching for {locations} now.")
 output_label.pack(pady = 5)
 root.update()
 
@@ -84,32 +86,33 @@ if chrome_file_check or firefox_file_check or edge_file_check:
     time.sleep(2)
     root.withdraw()
     root.update()
-    try:
-        xpath_expression = f"//td[contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{location}')]"
-        star_elements = driver.find_elements(By.XPATH, xpath_expression)
-        for element in star_elements:
-            # Get the parent <tr> of the found element
-            row = element.find_element(By.XPATH, "./ancestor::tr")  # Adjust the XPath to your HTML structure
-            
-            # Extract all cells in the row
-            cells = row.find_elements(By.TAG_NAME, "td")  # Assuming the data cells are <td> elements
-            # Print the text of each cell
-            increment = 0
-            row_data = ["Last reported: ", "World: ", "Size: ", "Location: ", "Region: ", "Caller: "]
-            for increment, cell in enumerate(cells):
-                if increment < len(row_data):
-                    row_data[increment] += cell.text
-            print(row_data)  # console print
-            output_label = tk.Label(root, text=row_data)
-            output_label.pack(pady= 5)
-            root.update()
-        if star_elements == []:
-            print("No stars matching search parameter have been reported.") # console print
-            output_label = tk.Label(root, text="No stars matching search parameter have been reported.")
-            output_label.pack(pady= 5)
-            root.update()
-    except Exception as e:
-        print("Error finding elements:", e)
+    for location in locations:
+        try:
+            xpath_expression = f"//td[contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{location}')]"
+            star_elements = driver.find_elements(By.XPATH, xpath_expression)
+            for element in star_elements:
+                # Get the parent <tr> of the found element
+                row = element.find_element(By.XPATH, "./ancestor::tr")  # Adjust the XPath to your HTML structure
+                
+                # Extract all cells in the row
+                cells = row.find_elements(By.TAG_NAME, "td")  # Assuming the data cells are <td> elements
+                # Print the text of each cell
+                increment = 0
+                row_data = ["Last reported: ", "World: ", "Size: ", "Location: ", "Region: ", "Caller: "]
+                for increment, cell in enumerate(cells):
+                    if increment < len(row_data):
+                        row_data[increment] += cell.text
+                print(row_data)  # console print
+                output_label = tk.Label(root, text=row_data)
+                output_label.pack(pady= 5)
+                root.update()
+            if star_elements == []:
+                print(f"No stars matching search parameter {location} have been reported.") # console print
+                output_label = tk.Label(root, text=f"No stars matching search parameter {location} have been reported.")
+                output_label.pack(pady= 5)
+                root.update()
+        except Exception as e:
+            print("Error finding elements:", e)
     print(f"Search completed at {datetime.now()}.") # console print
     output_label = tk.Label(root, text = f"Search completed at {datetime.now()}. Window will stay open for {window_duration} seconds.")
     output_label.pack(pady = 5)
